@@ -20,6 +20,35 @@ model Example {
   updatedAt DateTime @updatedAt
 }
 
+model JournalEntry {
+  id String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  journalDate DateTime
+  meals Meal[]
+}
+
+model Meal {
+  id String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String
+  journalEntry JournalEntry @relation(fields: [journalEntryid], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  journalEntryid String
+  foodEntries FoodEntry[]
+}
+
+model FoodEntry {
+  id String @id @default(cuid())
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  mealId String
+  name String
+  amount Int
+  unit String
+  kcal Int
+}
+
+
 // Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())

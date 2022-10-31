@@ -25,6 +25,7 @@ model JournalEntry {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   journalDate DateTime
+  weight Int
   meals Meal[]
 }
 

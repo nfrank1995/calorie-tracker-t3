@@ -17,9 +17,16 @@ const Home: NextPage = () => {
           <div className="grid grid-cols-[15rem_auto]">
             <div className="grid grid-rows-[3rem_auto]">
               <div className=" text-2xl text-cyan-600 p-2 border-b-2 border-cyan-600 border-opacity-20 ">
-              Calorie Tracker
+                Calorie Tracker
               </div>
-              <JournalList></JournalList>
+              <div className="grid grid-rows-[3rem_auto]">
+                <button 
+                  onClick={() => {console.log("Add Entry Button Clicked!")}}
+                  className="my-2 mx-12 rounded-2xl border-2 border-cyan-600 hover:bg-cyan-600 hover:text-cyan-50 text-cyan-600">
+                  Add Entry
+                </button>
+                <JournalList/>
+              </div>
             </div>
             <div className="m-5">
               test

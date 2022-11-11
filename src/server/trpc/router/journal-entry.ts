@@ -25,6 +25,24 @@ export const journalEntryRouter = router({
     return ctx.prisma.journalEntry.create({
         data: {}
     });
+  }),     
+  // update: publicProcedure
+  // .input(z.object({
+  //   id: z.string(),
+  //   weight: z.number(),
+  //   meals: z.array(z.object({}),
+  //   )
+  // }))
+  // .mutation(({ input, ctx }) => {
+  //   const { id, ...rest} = input;
+  //   return ctx.prisma.journalEntry.update({
+  //       where: {id},
+  //       data: {rest}
+  //   });
+  // }),   
+  deleteAll: publicProcedure
+  .mutation(({ ctx }) => {
+    return ctx.prisma.journalEntry.deleteMany();
   }),
 
 });

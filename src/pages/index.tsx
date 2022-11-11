@@ -1,46 +1,41 @@
+import { JournalEntry } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
-import { JournalEntry } from "@prisma/client";
-
 
 
 const Home: NextPage = () => {
-  // todo: trigger automatic rload after mutation
-  const journalEntries = trpc.journalEntry.getAll.useQuery();
-  const journalEntryCreate = trpc.journalEntry.create.useMutation();
 
+  const journalEntries = trpc.journalEntry.getAll.useQuery();
+
+  const utils = trpc.useContext();
+
+  const journalEntryAddMutation = trpc.journalEntry.create.useMutation({
+    onSuccess(){
+      utils.journalEntry.getAll.invalidate()
+    }
+  });
+
+  
   const addJournalEntry = () => {
-    journalEntryCreate.mutate();
+    journalEntryAddMutation.mutate();
   }
 
   return (
     <>
       <Head>
         <title>Calorie Tracker</title>
-        <meta name="description" content="Track you daily calorie intake" />
+        <meta name="description" content="Track your daily calorie intake" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-          <div className="grid grid-cols-[15rem_auto]">
             <div className="grid grid-rows-[3rem_auto]">
-              <div className="text-center text-2xl text-cyan-600 p-2 border-b-2 border-cyan-600 border-opacity-20 ">
+              <div className="text-2xl text-cyan-600 p-2 border-b-2 border-cyan-600 border-opacity-20 ">
                 Calorie Tracker
               </div>
-              <div className="grid grid-rows-[3rem_auto]">
-                <button 
-                  onClick={addJournalEntry}
-                  className="my-2 mx-12 rounded-2xl border-2 border-cyan-600 hover:bg-cyan-600 hover:text-cyan-50 text-cyan-600">
-                  Add Entry
-                </button>
-                <JournalList journalEntries={journalEntries.data ?? []} />
-              </div>
+              <JournalList journalEntries={journalEntries.data ?? []}></JournalList>
+              <AddJournalEntryButton addJournalEntry={addJournalEntry}></AddJournalEntryButton>
             </div>
-            <div className="m-5">
-              test
-            </div>
-          </div>
       </main>
     </>
   );
@@ -48,14 +43,31 @@ const Home: NextPage = () => {
 
 export default Home;
 
-const JournalList: React.FC<{journalEntries:JournalEntry[]}> = ({journalEntries}) => {
-  return(
-    <div className="flex flex-col text-center">
-        {journalEntries?.map((journalEntry, index) => {
-          return <div key={index}>{journalEntry.journalDate?.toString() ?? `New JournalEntry #${index}`}</div>
-        })}
-    </div>
-  )
+const AddJournalEntryButton: React.FC<{addJournalEntry: Function}> = ({addJournalEntry}) => {
 
+return <button className="text-cyan-600 rounded-xl font-bold border-cyan-600 border-2" onClick={() => addJournalEntry()}>Add Entry</button>
 }
 
+const JournalList: React.FC<{journalEntries: JournalEntry[]}> = ({journalEntries}) => {
+  return (
+    <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-3 p-3">
+      {journalEntries.map(() => {
+        return <JournalEntryCard></JournalEntryCard>
+      })}
+    </div>
+  )
+}
+
+const JournalEntryCard = () => {
+  return (
+  <>
+    <div className="basis-1/4 rounded-2xl bg-cyan-400 bg-opacity-20 p-3 shadow-xl hover:scale-105">
+      <h2 className="text-xl">Fr. 11.11.2022</h2> 
+      <div className="flex flex-row justify-between items-end">
+        <div>71,2 kg</div>
+        <div className="text-lg font-medium"> Kcal: 2386</div>
+      </div>
+    </div> 
+  </>
+  )
+}

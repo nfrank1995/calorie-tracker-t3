@@ -1,9 +1,9 @@
 import { JournalEntry } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { MouseEventHandler } from "react";
 import { trpc } from "../utils/trpc";
 
+const buttonClassString = "text-cyan-600 rounded-lg border-cyan-600 border-2 active:scale-105 px-2";
 
 const Home: NextPage = () => {
 
@@ -42,7 +42,7 @@ const Home: NextPage = () => {
       </Head>
       <main>
             <div className="grid grid-rows-[3rem_auto]">
-              <div className="text-2xl text-cyan-600 p-2 border-b-2 border-cyan-600 border-opacity-20 font-bold">
+              <div className="text-2xl text-cyan-600 p-2 border-b-2 border-cyan-600 border-opacity-20 font-bold text-center">
                 Calorie Tracker
               </div>
               <JournalList deleteEntry={deleteJournalEntry} journalEntries={journalEntries.data ?? []}></JournalList>
@@ -57,7 +57,7 @@ export default Home;
 
 const AddJournalEntryButton: React.FC<{addJournalEntry: Function}> = ({addJournalEntry}) => {
 
-return <button className="text-cyan-600 rounded-lg border-cyan-600 border-2 active:scale-125 px-2" onClick={() => addJournalEntry()}>Add Entry</button>
+return <button className={buttonClassString} onClick={() => addJournalEntry()}>Add Entry</button>
 }
 
 const JournalList: React.FC<{journalEntries: JournalEntry[], deleteEntry: Function}> = ({journalEntries, deleteEntry}) => {
@@ -80,13 +80,12 @@ const JournalEntryCard: React.FC<{journalEntry: JournalEntry, deleteEntry: Funct
   return (
   <>
     <div className="basis-1/4 rounded-lg text-cyan-600 border-cyan-600 border p-3 shadow-lg">
-      
         <div className="text-xl mb-2 font-bold">Fr. 11.11.2022</div> 
         <div>71,2 kg</div>
         <div>2386 kcal</div>
       <div className="flex flex-row space-x-2 justify-end items-end">
-        <button onClick={handleClick} className=" text-cyan-600 rounded-lg border-cyan-600 border-2 active:scale-125 px-2">Delete</button>
-        <button className=" text-cyan-600 rounded-lg border-cyan-600 border-2 active:scale-125 px-2">Edit</button>
+        <button onClick={handleClick} className={buttonClassString}>Delete</button>
+        <button className={buttonClassString}>Edit</button>
       </div>
     </div> 
   </>

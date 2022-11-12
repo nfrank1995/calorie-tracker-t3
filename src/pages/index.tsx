@@ -1,6 +1,7 @@
 import { JournalEntry } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
+import { MouseEventHandler } from "react";
 import { trpc } from "../utils/trpc";
 
 
@@ -12,13 +13,24 @@ const Home: NextPage = () => {
 
   const journalEntryAddMutation = trpc.journalEntry.create.useMutation({
     onSuccess(){
-      utils.journalEntry.getAll.invalidate()
+      utils.journalEntry.getAll.invalidate();
+    }
+  });
+
+  const journalEntryDeleteMutation = trpc.journalEntry.deleteWithId.useMutation({
+    onSuccess(){
+      utils.journalEntry.getAll.invalidate();
     }
   });
 
   
   const addJournalEntry = () => {
     journalEntryAddMutation.mutate();
+  }
+
+  const deleteJournalEntry = (id: string) => {
+    console.log(`Delete entry with id: ${id}`)
+    journalEntryDeleteMutation.mutate({id})
   }
 
   return (
@@ -30,10 +42,10 @@ const Home: NextPage = () => {
       </Head>
       <main>
             <div className="grid grid-rows-[3rem_auto]">
-              <div className="text-2xl text-cyan-600 p-2 border-b-2 border-cyan-600 border-opacity-20 ">
+              <div className="text-2xl text-cyan-600 p-2 border-b-2 border-cyan-600 border-opacity-20 font-bold">
                 Calorie Tracker
               </div>
-              <JournalList journalEntries={journalEntries.data ?? []}></JournalList>
+              <JournalList deleteEntry={deleteJournalEntry} journalEntries={journalEntries.data ?? []}></JournalList>
               <AddJournalEntryButton addJournalEntry={addJournalEntry}></AddJournalEntryButton>
             </div>
       </main>
@@ -45,27 +57,36 @@ export default Home;
 
 const AddJournalEntryButton: React.FC<{addJournalEntry: Function}> = ({addJournalEntry}) => {
 
-return <button className="text-cyan-600 rounded-xl font-bold border-cyan-600 border-2" onClick={() => addJournalEntry()}>Add Entry</button>
+return <button className="text-cyan-600 rounded-lg border-cyan-600 border-2 active:scale-125 px-2" onClick={() => addJournalEntry()}>Add Entry</button>
 }
 
-const JournalList: React.FC<{journalEntries: JournalEntry[]}> = ({journalEntries}) => {
+const JournalList: React.FC<{journalEntries: JournalEntry[], deleteEntry: Function}> = ({journalEntries, deleteEntry}) => {
   return (
     <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-3 p-3">
-      {journalEntries.map(() => {
-        return <JournalEntryCard></JournalEntryCard>
+      {journalEntries.map((journalEntry) => {
+        return <JournalEntryCard journalEntry={journalEntry} deleteEntry={deleteEntry} key={journalEntry.id}></JournalEntryCard>
       })}
     </div>
   )
 }
 
-const JournalEntryCard = () => {
+const JournalEntryCard: React.FC<{journalEntry: JournalEntry, deleteEntry: Function}> = ({journalEntry, deleteEntry}) => {
+  
+  function handleClick(e: React.MouseEvent<HTMLButtonElement>){
+    e.preventDefault();
+    deleteEntry(journalEntry.id);
+  }
+  
   return (
   <>
-    <div className="basis-1/4 rounded-2xl bg-cyan-400 bg-opacity-20 p-3 shadow-xl hover:scale-105">
-      <h2 className="text-xl">Fr. 11.11.2022</h2> 
-      <div className="flex flex-row justify-between items-end">
+    <div className="basis-1/4 rounded-lg text-cyan-600 border-cyan-600 border p-3 shadow-lg">
+      
+        <div className="text-xl mb-2 font-bold">Fr. 11.11.2022</div> 
         <div>71,2 kg</div>
-        <div className="text-lg font-medium"> Kcal: 2386</div>
+        <div>2386 kcal</div>
+      <div className="flex flex-row space-x-2 justify-end items-end">
+        <button onClick={handleClick} className=" text-cyan-600 rounded-lg border-cyan-600 border-2 active:scale-125 px-2">Delete</button>
+        <button className=" text-cyan-600 rounded-lg border-cyan-600 border-2 active:scale-125 px-2">Edit</button>
       </div>
     </div> 
   </>

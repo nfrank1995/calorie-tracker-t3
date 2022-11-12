@@ -40,9 +40,15 @@ export const journalEntryRouter = router({
   //       data: {rest}
   //   });
   // }),   
-  deleteAll: publicProcedure
-  .mutation(({ ctx }) => {
-    return ctx.prisma.journalEntry.deleteMany();
+  deleteWithId: publicProcedure
+  .input(z.object({
+    id: z.string(),
+  }))
+  .mutation(({ input, ctx }) => {
+    const {id, ...rest} = input;
+    return ctx.prisma.journalEntry.delete({
+      where: {id}
+    });
   }),
 
 });
